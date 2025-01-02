@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page title</title>
+</head>
+<body>
+    <h1>Web details</h1>
+    <h2>HREF: <span id="href"></span></h2>
+    <h2>HOSTNAME: <span id="host"></span></h2>
+    <h2>PORT: <span id="port"></span></h2>
+<script>
+const hr = document.getElementById("href")
+    const host = document.getElementById("host")
+    const port = document.getElementById("port")
+    hr.innerHTML = window.location.href
+    host.innerHTML = window.location.hostname
+    port.innerHTML = window.location.port
+</script>
+</body>
+</html>
