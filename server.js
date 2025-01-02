@@ -4,7 +4,7 @@ const port = process.env.PORT || 3000;
 const cors = require('cors');
 server.use(cors());
 server.use(express.json());
-myIp = '192.168.224.199'
+
 let pTime = '' ;
 let pDate = '';
 
@@ -57,6 +57,6 @@ server.post("/messages",(req,res)=>{
     console.log(req.hostname);
 
 })
-server.listen(port,myIp,()=>{
+server.listen(port,()=>{
     console.log(`listening on port ${port}`);
 })
