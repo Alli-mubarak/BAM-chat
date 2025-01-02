@@ -1,3 +1,14 @@
-"scripts": {
-  "start": "node server.js"
+{
+  "name": "my-express-server",
+  "version": "1.0.0",
+  "description": "A simple Express server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "author": "BAM-tech",
+  "license": "ISC"
 }
