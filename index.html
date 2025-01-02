@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMchat</title>
+    <style>
+        *{
+            font-weight: 300;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+        body{
+            margin: 0; padding: 0;
+        }
+        .container{
+            position: relative;
+        }
+        .username-page{
+            position: absolute;
+            background: #ddd;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+        }
+        .username-page h2,h5{
+            text-align: center;
+            margin: 5px 0;
+        }
+        .username-input{
+            width: 70%;
+            text-align: center;
+            margin: 30vh auto 0;
+            height: 80px;
+            background: #aaa;
+            padding-top: 20px;
+            border-radius: 5px;
+            color: #ddd;
+            align-items: center;
+            justify-items: center;
+        }
+        .label-input{
+            width: fit-content;
+            text-align: left;
+        }
+        .username-input label{
+            font-size: 14px;
+            color: #222;
+        }
+        .username-input input{
+            padding: 5px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            background: rgba(0,0,0,0.5);
+            color: #ddd;
+        }
+        .username-input button{
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            outline: none;
+            border: none;
+            background: rgba(0,0,0,0.8);
+            color: #ddd;
+
+        }
+        .username-input p{
+            font-size: 11px;
+            color: #222;
+        }
+        .loader{
+            width: 70px; height: 70px;
+            background: rgba(0,0,0,0.2);
+            margin:40vh auto 0;
+            position: relative;
+            display: none;
+        }
+        .loader::before{
+            position: absolute;
+            content: '';
+            width: 30px; height: 30px;
+            background:transparent;
+            top: 18px; left: 18px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            border-bottom-color: transparent;
+            animation: roll linear infinite 2s;
+        }
+        @keyframes roll {
+            to{
+                transform: rotate(360deg);
+            }
+        }
+        .chat-page{
+            width: 95%;
+            margin:  auto;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .message-area{
+            margin: 20px auto;
+            width: 90%; height: 80%;
+            background: rgba(225,225,225,0.7);
+            padding: 10px 0;
+            border-radius: 5px;
+            position: relative;
+        }
+        .message-area .interaction{
+            text-align: center;
+            font-size: 12px;
+            color: #222;
+        }
+        .label{
+            margin-top: 5px;
+            text-align: center;
+            font-size: 9px;
+            color: #444;
+        }
+        .message-area .menu{
+            width: 2rem; height: 2rem;
+            position: absolute;
+            cursor: pointer;
+            top: 25px;
+            left: calc(100% - 3rem);
+        }
+        .message-area .menu span{
+            position: absolute;
+            width: 10%; height: 10%;
+            background: black;
+            left: 45%; top: 20%;
+            border-radius: 5px;
+        }
+        .message-area .menu span:nth-child(2){
+            top: 40%;
+        }
+        .message-area .menu span:nth-child(3){
+            top: 60%;
+        }
+        .ip-change{
+            position: absolute;
+            font-size: 12px;
+            width: 30%; height: 70px;
+            background: #999;
+            text-align: center;
+            left: calc(100% - 35%);
+            border-radius: 4px;
+            padding: 5px 0;
+            display: none;
+        }
+        .ip-change.active{
+            display: block;
+        }
+        .ip-change input{
+            width: 80%;
+            font-size: 11px;
+            padding: 3px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+        .ip-change button{
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+        .message-area .messages{
+            height: 90%;
+            overflow-y: auto;
+            overflow-x:hidden ;
+            margin: auto;
+        }
+        .messages div{
+            background: rgba(225,225,225,0.9);
+            width: fit-content;
+            padding: 5px 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            max-width: 60%;
+            
+        }
+        .messages div .sender{
+            font-size: 10px;
+        }
+        .messages div pre{
+            text-wrap: wrap;
+        }
+        .messages .time-date{
+            font-size: 8px;
+            color: #555;
+            width: fit-content;
+            margin-left: auto;
+        }
+        .messages .err{
+            text-align: center;
+            font-size: 11px;
+            font-weight: 100;
+            margin-bottom: auto;
+        }
+        .result{
+            text-align: center;
+            font-size: 8px;
+        }
+        .input-area{
+            width: 90%;
+            margin: auto;
+            display: flex;
+            height: 10%;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        .input-area .go-down{
+            position: absolute;
+            width: 30px; height: 30px;
+            background: rgba(0,0,0,0.1);
+            text-align: center;
+            color: #222;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            top: -90%;
+            left: 90%;
+            border-radius: 50%;
+            transform: rotate(90deg);
+            cursor: pointer;
+            animation: bounce linear infinite 1s;
+        }
+        @keyframes bounce {
+            from{
+                top: -100%;
+            }
+            to{
+                top: -90%;
+            }
+        }
+        .input-area textarea{
+            width: 90%;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .input-area .send{
+            font-size: 50px;
+            color:green;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+    <section class="container">
+        <section class="username-page">
+            <h2>BAMchat</h2>
+            <h5>by BAM-TECH</h5>
+            <div class="username-input">
+                <form class="label-input">
+                <label for="username-input">Enter your username to join the chat</label><br>
+                <input type="text" name="username" id="username-input">
+                <button type="submit" onclick="enterUsername(this)">Enter</button>
+                </form>
+                <p id="report"></p>
+            </div>
+            <div class="loader"></div>
+        </section>
+    
+      <section class="chat-page">
+        <div class="message-area">
+            <p class="interaction">You are interacting as <span id="username">user</span></p>
+            <p class="label">conversations will appear here</p>
+            <div class="menu">
+                <span></span><span></span><span></span>
+            </div>
+            <form class="ip-change">
+                <label for="ip=input">change IP Address</label><br>
+                <input type="tel" maxlength="15" name="ip-input" id="ip-input" placeholder="enter address"><br><br>
+                <button type="submit" onclick="ipChange()">Change</button>
+            </form>
+            <div class="messages"></div>
+            <p class="result"></p>
+        </div>
+        
+        <div class="input-area">
+            <textarea name="message" id="message" placeholder="Type message here ......"></textarea>
+            <div class="send" onclick="sendMessage()">&#x27A2;</div>
+            <div class="go-down" onclick="goDown()">&#x2794;</div>
+        </div>
+      </section>
+    </section>
+<script>
+    // myIp = '192.168.95.199'
+   let  myIp;
+const report = document.getElementById("report");
+const usernamePage  = document.querySelector(".username-page");
+const usernameInputBox  = document.querySelector(".username-input");
+const username = document.getElementById("username");
+const loader = document.querySelector(".loader");
+const messageBox = document.querySelector(".messages");
+let messagesLength;
+let noOfMessages = 0;
+const inputter = document.querySelector("#message");
+const result = document.querySelector(".result");
+let cssSheet = document.querySelector("style").sheet;
+const usernameForm = document.querySelector(".label-input");
+const ipInput = document.getElementById("ip-input")
+const ipForm = document.querySelector(".ip-change");
+const menu = document.querySelector(".menu");
+let senderName = 'mubarak';
+    const usernameInput = document.getElementById("username-input");
+    function enterUsername(me){
+        
+        if(usernameInput.value.length > 3){
+        let myCss = `
+        .${usernameInput.value}{
+            margin-left: auto;
+            border-color: lightblue;
+            border-radius: 30px 30px 0 30px ;
+            border:1px solid lightblue;
+            margin-right: 20px;
+        }`;
+        let myNameCss = `
+        .${usernameInput.value} .sender{
+        display:none;
+        }`
+        let othersCss = `
+        .messages div:not(.${usernameInput.value}){
+            border-color: lightgreen;
+            border-radius: 30px 30px 30px 0;
+            border:1px solid lightgreen;
+            margin-left: 20px;
+        }`
+        let othersNameCss = `
+        .messages div:not(.${usernameInput.value}) .sender{
+            color: green;
+        }`
+        
+            senderName = usernameInput.value;
+            username.innerHTML = senderName;
+            cssSheet.insertRule(myCss,0);
+            cssSheet.insertRule(myNameCss,1);
+            cssSheet.insertRule(othersCss,2);
+            cssSheet.insertRule(othersNameCss,3);
+            usernameInputBox.style.display = 'none';
+            loader.style.display = "block";
+            me.setAttribute("disabled","true");
+            setTimeout(() => {
+                usernamePage.style.display = "none";
+                loader.style.display = 'none';
+            }, 5000);
+            
+
+            setTimeout(() => {
+                usernameInput.value = '';
+            }, 1000);
+        }
+        else{
+            report.innerHTML = "Enter a valid username!"
+            setTimeout(() => {
+                report.innerHTML ='';
+            }, 1000);
+        }
+    }
+    usernameForm.addEventListener("submit", (e) =>{
+    e.preventDefault();
+    enterUsername();
+})
+function seekMessages(){
+let messageID = setInterval(() => {
+    loadMessages();
+}, 600);
+function loadMessages(){
+    fetch(`http://${myIp}:1800/messages`)
+    .then(res=> res.text())
+    .then(data =>(
+        messageBox.innerHTML = data
+    ))
+    .catch(error =>{
+        clearInterval(messageID);
+        messageBox.innerHTML=`<p class="err">Unable to connect to server, reload page!</p>`;
+    })
+}
+loadMessages();
+}
+seekMessages()
+function sendMessage(){
+    setTimeout(() => {
+        result.innerHTML = '';
+        inputter.value = '';
+        goDown();
+    }, 1000);
+    if (inputter.value.length > 1){
+     let message = {"content":inputter.value, "sender":senderName}
+     fetch(`http://${myIp}:1800/messages`,{
+            method:'POST',
+        headers:{
+        'Content-type':'application/json'
+        },
+        body:JSON.stringify(message)
+        })
+        .catch(error =>{
+            result.innerHTML = "Unable to connect to server, try again!";
+        })
+}
+}
+function ipChange(){
+let ip = ipInput.value
+let octet1 = ip.slice(0, 3)
+let octet2 = ip.slice(3, 6)
+let octet3 = ip.slice(6,8)
+let octet4 = ip.slice(8)
+sortedIP = `${octet1}.${octet2}.${octet3}.${octet4}`
+myIp = ip;
+    console.log("IP Address updated: " + myIp);
+    seekMessages();
+    setTimeout(()=>{
+        ipInput.value = '';
+    },500)
+}
+
+    ipForm.addEventListener("submit", (e) =>{
+    e.preventDefault();
+    ipChange();
+})
+
+menu.onclick = () =>{
+    ipForm.classList.toggle('active');
+}
+function goDown(){
+    messageBox.scrollTo(0, messageBox.scrollHeight);
+}
+</script>
+</body>
+</html>
